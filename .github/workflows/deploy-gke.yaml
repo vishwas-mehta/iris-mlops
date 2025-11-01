@@ -40,13 +40,11 @@ jobs:
     - name: Build Docker image
       run: |
         docker build \
-          --tag "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ github.sha }}" \
           --tag "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:latest" \
           .
 
     - name: Push Docker image to Artifact Registry
       run: |
-        docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ github.sha }}"
         docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:latest"
 
     - name: Get GKE credentials
@@ -57,7 +55,6 @@ jobs:
 
     - name: Deploy to GKE
       run: |
-        sed -i "s|GITHUB_SHA|${{ github.sha }}|g" k8s-deployment.yaml
         kubectl apply -f k8s-deployment.yaml
         kubectl rollout status deployment/${{ env.DEPLOYMENT_NAME }}
         kubectl get services -o wide
